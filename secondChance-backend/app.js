@@ -12,7 +12,7 @@ const connectToDatabase = require('./models/db');
 const secondChanceItemsRoutes = require('./routes/secondChanceItemsRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 // (Auth optional for now)
-//const authRoutes = require('./routes/authRoutes'); // only if file exists
+const authRoutes = require('./routes/authRoutes'); // only if file exists
 
 const app = express();
 const port = 3060;
@@ -35,7 +35,7 @@ connectToDatabase()
 // ✅ Use Routes
 
 // Auth (only if implemented)
-//app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 
 // Items API (MOST IMPORTANT)
 app.use('/api/secondchance/items', secondChanceItemsRoutes);
