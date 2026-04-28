@@ -44,7 +44,7 @@ router.post('/', upload.single('file'), async (req, res, next) => {
     const secondChanceItem = req.body
 
     // Generate new ID
-    const lastItemQuery = await collection.find().sort({ id: -1 }).limit(1)
+    //const lastItemQuery = await collection.find().sort({ id: -1 }).limit(1)
 
     let newId = 1
     const lastItem = await collection.find().sort({ id: -1 }).limit(1).toArray()
