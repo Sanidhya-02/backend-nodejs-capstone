@@ -3,6 +3,7 @@ const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const connectToDatabase = require('../models/db');
 const router = express.Router();
+const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 const pino = require('pino');
 
@@ -127,6 +128,71 @@ router.post('/login', async (req, res) => {
         return res.status(500).json({
             error: 'Internal server error'
         });
+    }
+});
+
+// 🔄 UPDATE USER PROFILE
+router.put('/update', async (req, res) => {
+
+    // ✅ Task 2: Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logger.error('Validation errors', errors.array());
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        // ✅ Task 3: Check email in header
+        const email = req.headers.email;
+
+        if (!email) {
+            logger.error('Email not found in headers');
+            return res.status(400).json({
+                error: 'Email not found in headers'
+            });
+        }
+
+        // ✅ Task 4: Connect DB
+        const db = await connectToDatabase();
+        const collection = db.collection('users');
+
+        // ✅ Task 5: Find user
+        const existingUser = await collection.findOne({ email });
+
+        if (!existingUser) {
+            logger.error('User not found');
+            return res.status(404).json({
+                error: 'User not found'
+            });
+        }
+
+        // Update fields (lab keeps it simple)
+        existingUser.firstName = req.body.name;
+        existingUser.updatedAt = new Date();
+
+        // ✅ Task 6: Update DB
+        const updatedUser = await collection.findOneAndUpdate(
+            { email },
+            { $set: existingUser },
+            { returnDocument: 'after' }
+        );
+
+        // ✅ Task 7: JWT
+        const payload = {
+            user: {
+                id: updatedUser._id.toString()
+            }
+        };
+
+        const authtoken = jwt.sign(payload, JWT_SECRET);
+
+        logger.info('User updated successfully');
+
+        res.json({ authtoken });
+
+    } catch (e) {
+        logger.error(e);
+        return res.status(500).send('Internal server error');
     }
 });
 
