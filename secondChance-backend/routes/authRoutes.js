@@ -130,7 +130,7 @@ router.post('/login', async (req, res) => {
 })
 
 // 🔄 UPDATE USER PROFILE
-router.put('/update',[ body('name').isLength({ min: 2 }) ], async (req, res) => {
+router.put('/update', [body('name').isLength({ min: 2 })], async (req, res) => {
   // ✅ Task 2: Validate input
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
